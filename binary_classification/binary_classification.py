@@ -11,7 +11,6 @@ torch.manual_seed(1)
 # Generate synthetic data
 x, y = make_circles(n_samples=1000, noise=0.03, random_state=42)
 
-# Convert to torch tensors
 X = torch.from_numpy(x).type(torch.float)
 Y = torch.from_numpy(y).type(torch.float)
 
