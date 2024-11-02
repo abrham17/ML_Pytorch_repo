@@ -17,9 +17,7 @@ warnings.filterwarnings('ignore')
 '''
 2) The true model and training data
 '''
-##################################################
-## ground-truth model
-##################################################
+
 
 def goalFun(x):
     return(x**3 - x**2 + 25 * np.sin(2*x))
