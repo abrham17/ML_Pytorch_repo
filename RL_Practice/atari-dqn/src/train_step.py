@@ -79,7 +79,7 @@ def train_step(
             * (1 - dones)
             * max_next_q_values
         )
-
+        td_error = targets - current_q_values
     # --------------------------------
     # 4. Loss
     # --------------------------------
@@ -99,4 +99,4 @@ def train_step(
 
     optimizer.step()
 
-    return loss.item()
+    return loss.item(), td_error

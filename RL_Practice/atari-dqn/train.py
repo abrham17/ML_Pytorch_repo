@@ -14,7 +14,7 @@ from gymnasium.wrappers import (
 )
 
 from src.dqn_network import DQNetwork
-from src.replay_buffer import ReplayBuffer
+from src.replay_buffer import PrioritizedReplayBuffer
 from src.train_step import train_step
 
 
@@ -23,7 +23,7 @@ from src.train_step import train_step
 # ==========================================
 
 SEED = 42
-
+BETA = 0.4
 TOTAL_STEPS = 100_000
 
 REPLAY_CAPACITY = 1000
@@ -126,7 +126,7 @@ optimizer = torch.optim.Adam(
 # 6. CREATE REPLAY BUFFER
 # ==========================================
 
-replay_buffer = ReplayBuffer(
+replay_buffer = PrioritizedReplayBuffer(
     capacity=REPLAY_CAPACITY
 )
 
@@ -251,13 +251,13 @@ try:
         # C. Store experience
         # ----------------------------------
 
-        replay_buffer.push(
+        replay_buffer.add((
             np.asarray(state, dtype=np.uint8).copy(),
             action,
             reward,
             np.asarray(next_state, dtype=np.uint8).copy(),
-            terminated
-        )
+            terminated,
+        ))
 
         # ----------------------------------
         # D. Update episode statistics
@@ -272,12 +272,12 @@ try:
 
         if replay_buffer.len() >= LEARNING_STARTS:
 
-            batch = replay_buffer.sample(
-                BATCH_SIZE
+            samples, indices, weights = replay_buffer.sample(
+                BATCH_SIZE , BETA
             )
 
-            last_loss = train_step(
-                batch,
+            last_loss , td_error = train_step(
+                samples,
                 online_network,
                 target_network,
                 optimizer,
@@ -285,6 +285,7 @@ try:
                 device
             )
 
+            replay_buffer.update_priorities(indices, td_error)
             training_steps += 1
 
             # ----------------------------------

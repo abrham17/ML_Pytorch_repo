@@ -3,10 +3,10 @@ import torch.nn as nn
 
 
 class DQNetwork(nn.Module):
-    def __init__(self, input_channel, num_actions):
+    def __init__(self, input_channels, num_actions):
         super(DQNetwork, self).__init__()
         self.conv = nn.Sequential(
-            nn.Conv2d(input_channel, 32, kernel_size=8, stride=4),
+            nn.Conv2d(input_channels, 32, kernel_size=8, stride=4),
             nn.ReLU(),
             nn.Conv2d(32, 64, kernel_size=4, stride=2),
             nn.ReLU(),
